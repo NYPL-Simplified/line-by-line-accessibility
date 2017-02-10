@@ -1,0 +1,16 @@
+{
+  "name": "nypl-line-accessibility",
+  "version": "0.0.0",
+  "author": "NYPL",
+  "description": "Tiny line-grouping and analysis library for paginated HTML",
+  "repository": "https://github.com/NYPL-Simplified/line-by-line-accessibility.git",
+    "license": "ISC",
+
+  "scripts": {
+    "prepare": "tsc --p ."
+  },
+  
+  "dependencies": {
+    "typescript": "^2.1.0"
+  }
+}
