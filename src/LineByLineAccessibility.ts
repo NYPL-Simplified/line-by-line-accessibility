@@ -1,17 +1,16 @@
-/** Represents a document that has been analyzed for line-by-line
- * accessibilty. */
+/** Represents a document that has been made line-by-line accessible. */
 export interface Document {
   /** Non-sparse. `pages.length` will return an accurate page count even if
    * some pages do not contain any lines. */
   pages: Page[];
-  /** The width of a single page at the time the document was analyzed. If the
+  /** The width of a single page at the time the document was processed. If the
    * width or height of a page changes at a later point in time (e.g. due to the
    * browser frame being resized), the entire document is invalid. */
   pageWidth: number;
 }
 
-/** Represents a page within a paginated document that has been analyzed for
- * line-by-line accessibilty. */
+/** Represents a page within a paginated document that has been made
+ * line-by-line accessible. */
 export interface Page {
   /** Non-sparse. `lines.length` will return an accurate line count. */
   lines: Line[];
@@ -31,10 +30,10 @@ export interface Line {
 }
 
 /** Traverses `document.body` wrapping every word in its own span, then returns
- * a representation of the analyzed document.
+ * a representation of the processed document.
  *
  * This function is not guaranteed to be safe to run more than once. */
-export function analyzeDocument(): Document {
+export function processDocument(): Document {
   const spans = transformWordsToSpans();
   const lines = linesOfSpans(spans);
   const pages = pagesOfLines(lines);
