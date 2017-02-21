@@ -64,7 +64,7 @@ function transformWordsToSpans(): HTMLSpanElement[] {
         // Split using contiguous whitespace as the separator but also keep the
         // whitespace in the result unchanged.
         const words = childNode.data.split(/(\s+)/g);
-        for(const [index, word] of words.entries()) {
+        for(const word of words) {
           // Skip leading and trailing empty splits (as you will get if `words`
           // began or ended with whitespace).
           if(word === "") continue;
@@ -82,14 +82,6 @@ function transformWordsToSpans(): HTMLSpanElement[] {
           // Inserting each span before the node we're processing is a simple
           // way to add them to the DOM in the correct order.
           element.insertBefore(span, childNode);
-          // Add a space if we have more words to add. We do not to this
-          // unconditionally because it would change the appearance of things
-          // like <span>foo</span><span>bar</span>.
-          const lastIndex = words.length - 1;
-          if(index < lastIndex) {
-            const space = document.createTextNode(" ");
-            element.insertBefore(space, childNode);
-          }
         }
         // Remove the original node now that it has been processed and the
         // resulting nodes have been inserted.
