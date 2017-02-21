@@ -157,11 +157,11 @@ function linesOfSpans(spans: HTMLSpanElement[]): Line[] {
 
   function beginNextLine(
     firstSpan: HTMLSpanElement,
-    initalClientRect: ClientRect)
+    initialClientRect: ClientRect)
   {
     ++currentLineIndex;
     currentLineSpans = [firstSpan];
-    currentLineClientRect = initalClientRect;
+    currentLineClientRect = initialClientRect;
   }
 
   function continueLine(span: HTMLSpanElement, clientRectOfSpan: ClientRect) {
