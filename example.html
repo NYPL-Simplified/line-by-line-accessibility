@@ -6,7 +6,7 @@
   <title>Click Test</title>
   <script type="text/javascript" src="require.js"></script>
   <script type="text/javascript">
-    var analyzedDocument;
+    var processedDocument;
 
     requirejs.config({
       baseUrl: 'dist',
@@ -14,12 +14,12 @@
 
     requirejs(['LineByLineAccessibility'], LineByLineAccessibility => {
       if(document.readyState === "complete") {
-        analyzedDocument = LineByLineAccessibility.analyzeDocument();
+        processedDocument = LineByLineAccessibility.processDocument();
       } else {
         window.addEventListener(
           "load",
           () => {
-            analyzedDocument = LineByLineAccessibility.analyzeDocument();
+            processedDocument = LineByLineAccessibility.processDocument();
           },
           false
         );
