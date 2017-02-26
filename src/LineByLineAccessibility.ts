@@ -3,10 +3,6 @@ export interface Document {
   /** Non-sparse. `pages.length` will return an accurate page count even if
    * some pages do not contain any lines. */
   pages: Page[];
-  /** The width of a single page at the time the document was processed. If the
-   * width or height of a page changes at a later point in time (e.g. due to the
-   * browser frame being resized), the entire document is invalid. */
-  pageWidth: number;
 }
 
 /** Represents a page within a paginated document that has been made
@@ -16,13 +12,16 @@ export interface Page {
   lines: Line[];
 }
 
+/** Similar to `ClientRect` except it expresses a location within the page upon
+ * which an element appears. */
+type PageRelativeRect = ClientRect
+
 /** Represents a single line of text and its location within the document. */
 export interface Line {
-  /** Contains an untranslated `ClientRect` object and thus represents a
-   * location within the document itself. To get the location of a `Line` within
-   * a given `Page`, it is necessary to interpret `clientRect.left` and
-   * `clientRect.right` modulo the width of the page. */
-  clientRect: ClientRect;
+  /** The index of the page upon which the line appears (starting from 0). */
+  pageIndex: number;
+  /** The location of the line within the page upon which it appears. */
+  pageRelativeRect: PageRelativeRect;
   /** The text that appeared within the line. For lines that ended mid-word
    * (e.g. due to hyphenation), the entire word will be grouped with the second
    * line. */
@@ -40,7 +39,6 @@ export function processDocument(): Document {
 
   return {
     pages: pages,
-    pageWidth: window.innerWidth
   };
 }
 
@@ -123,6 +121,19 @@ function pageIndexOfClientRect(rect: ClientRect): number {
   return Math.floor((rect.left + window.pageXOffset) / window.innerWidth);
 }
 
+/** Converts a `ClientRect` to a `PageRelativeRect` by taking into account the
+ * current page width. */
+function pageRelativeRectOfClientRect(rect: ClientRect): PageRelativeRect {
+  return {
+    left: rect.left % window.innerWidth,
+    right: rect.right % window.innerWidth,
+    top: rect.top,
+    bottom: rect.bottom,
+    width: rect.width,
+    height: rect.height
+  };
+}
+
 /** Analyze all spans to determine on which line they appear. This is done as a
  * separate step after all the spans have been made to avoid continually forcing
  * layout while nodes are still being inserted. */
@@ -141,7 +152,8 @@ function linesOfSpans(spans: HTMLSpanElement[]): Line[] {
 
   function addCurrentLineToLines() {
     lines[currentLineIndex] = {
-      clientRect: currentLineClientRect,
+      pageIndex: pageIndexOfClientRect(currentLineClientRect),
+      pageRelativeRect: pageRelativeRectOfClientRect(currentLineClientRect),
       text: currentLineSpans.map(s => (s.firstChild as Text).data).join(" ")
     }
   }
@@ -209,11 +221,10 @@ function pagesOfLines(lines: Line[]): Page[] {
 
   // Group pages into lines.
   for(const line of lines) {
-    const index = pageIndexOfClientRect(line.clientRect);
-    if(pages[index] === undefined) {
-      pages[index] = {lines: []};
+    if(pages[line.pageIndex] === undefined) {
+      pages[line.pageIndex] = {lines: []};
     }
-    pages[index].lines.push(line);
+    pages[line.pageIndex].lines.push(line);
   }
 
   // Ensure our array is non-sparse and includes all pages. This makes use of
